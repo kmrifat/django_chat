@@ -1,0 +1,7 @@
+.idea
+.vscode
+
+db.sqlite3
+Pipfile.lock
+static/
+media/
