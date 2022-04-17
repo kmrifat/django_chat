@@ -67,7 +67,7 @@ export default {
     },
 
     scrollDown() {
-      this.$refs.chatBody.scrollTo(0, this.$refs.chatBody.scrollHeight)
+      // this.$refs.chatBody.scrollTo(0, this.$refs.chatBody.scrollHeight)
     }
   },
   mounted() {

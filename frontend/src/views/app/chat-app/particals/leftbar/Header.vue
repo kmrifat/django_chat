@@ -8,7 +8,7 @@
                  src="http://themesbox.in/admin-templates/gappa/html/light/assets/images/logo.svg"
                  alt="Generic placeholder image">
             <div class="media-body">
-              <h5 class="mb-0 mt-2">Chat</h5>
+              <h5 class="mb-0 mt-2"> {{ $store.state.activeUser.name }}</h5>
             </div>
           </li>
         </ul>
@@ -24,11 +24,18 @@
 </template>
 
 <script>
+import axios from "../../../../../axios";
+
 export default {
   name: "Header",
   methods: {
-    logout() {
-      this.$router.replace('/')
+    async logout() {
+      await axios.post('authentication/logout/').then(response => {
+        this.$store.dispatch('clearState')
+        this.$router.replace('/')
+      }).catch(error => {
+        console.log(error)
+      })
     }
   }
 }

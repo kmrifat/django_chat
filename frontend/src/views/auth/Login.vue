@@ -9,11 +9,11 @@
 
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
+      <input type="text" v-model="user.username" class="form-control" id="floatingInput" placeholder="name@example.com">
       <label for="floatingInput">Username</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+      <input type="password" v-model="user.password" class="form-control" id="floatingPassword" placeholder="Password">
       <label for="floatingPassword">Password</label>
     </div>
 
@@ -35,11 +35,28 @@
 </template>
 
 <script>
+import axios from "../../axios";
+
 export default {
   name: "Login",
+  data() {
+    return {
+      user: {
+        username: '',
+        password: ''
+      }
+    }
+  },
   methods: {
-    login() {
-      this.$router.replace({path: '/app'})
+    async login() {
+      await axios.post('authentication/login/', this.user).then(response => {
+        this.$store.commit('SET_TOKEN', response.data.token)
+        this.$store.commit('UPDATE_USER', response.data.user)
+        this.$router.replace({path: '/app'})
+      }).catch(error => {
+        console.log(error)
+      })
+
     }
   }
 }

@@ -9,23 +9,23 @@
 
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
-      <label for="floatingInput">Username</label>
+      <input type="text" class="form-control" v-model="user.username" placeholder="name@example.com">
+      <label>Username</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
-      <label for="floatingInput">First Name</label>
+      <input type="text" class="form-control" v-model="user.first_name" placeholder="name@example.com">
+      <label>First Name</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com">
-      <label for="floatingInput">Last Name</label>
+      <input type="text" class="form-control" v-model="user.last_name" placeholder="name@example.com">
+      <label>Last Name</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-      <label for="floatingPassword">Password</label>
+      <input type="password" class="form-control" v-model="user.password" placeholder="Password">
+      <label>Password</label>
     </div>
 
 
@@ -40,11 +40,30 @@
 </template>
 
 <script>
+import axios from "../../axios";
+
 export default {
   name: "Registration",
+  data() {
+    return {
+      user: {
+        username: '',
+        first_name: '',
+        last_name: '',
+        password: ''
+      },
+      error: null
+    }
+  },
   methods: {
-    register() {
-      this.$router.replace('/app')
+    async register() {
+      await axios.post('/authentication/registration/', this.user).then(response => {
+        console.log(response.data)
+        // this.$router.replace('/')
+      }).catch(error => {
+        this.error = error.response.data
+      })
+
     }
   }
 }

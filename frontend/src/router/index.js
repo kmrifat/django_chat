@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from "vue-router";
+import store from "../store";
 
 const routes = [
     {
@@ -8,19 +9,51 @@ const routes = [
             {path: 'registration', component: () => import('../views/auth/Registration.vue')},
             {path: 'forget-password', component: () => import('../views/auth/ForgetPassword.vue')},
             {path: 'reset-password', component: () => import('../views/auth/ResetPassword.vue')}
-        ]
+        ],
+        meta: {
+            guest: true
+        }
     },
     {
         path: '/app', component: () => import('../views/app/Layout.vue'),
         children: [
             {path: '', component: () => import('../views/app/chat-app/ChatApp.vue')}
-        ]
+        ],
+        meta: {
+            auth: true
+        }
     }
 ]
+
 
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+router.beforeEach((to, from, next) => {
+    window.scrollTo(0, 0)
+    if (to.matched.some(record => record.meta.auth)) {
+        if (store.state.token == null) {
+            next({
+                path: '/',
+                params: {nextUrl: to.fullPath}
+            })
+        } else {
+            next()
+        }
+    } else if (to.matched.some(record => record.meta.guest)) {
+        if (store.state.token == null) {
+            next()
+        } else {
+            next({
+                path: '/app',
+                params: {nextUrl: to.fullPath}
+            })
+        }
+    } else {
+        next()
+    }
 })
 
 export default router

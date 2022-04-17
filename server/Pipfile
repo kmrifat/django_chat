@@ -9,6 +9,10 @@ channels = "*"
 django-extensions = "*"
 pillow = "*"
 djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+channels-redis = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

@@ -10,7 +10,7 @@
                src="http://themesbox.in/admin-templates/gappa/html/light/assets/images/girl.svg" alt="User Image">
           <div class="media-body">
             <h5>{{ user.name }} <span class="chat-timing">{{ user.messages[0]?.date_time }}</span></h5>
-            <p>{{ user.messages ? user.messages[0].text : user.status }}</p>
+            <p>{{ user.status }}</p>
           </div>
         </div>
       </a>
@@ -23,9 +23,9 @@ import {store} from "../../store";
 
 export default {
   name: "UserList",
+  props: ['users'],
   data() {
     return {
-      users: store.users,
       selected_user: store.selected_user
     }
   },

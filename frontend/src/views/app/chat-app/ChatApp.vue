@@ -6,7 +6,7 @@
 
       <search-bar></search-bar>
 
-      <user-list v-model="selected_user"></user-list>
+      <user-list v-model="selected_user" :users="users"></user-list>
 
 
       <div class="chat-menu">
@@ -57,6 +57,7 @@ import Search from "./particals/leftbar/Search.vue";
 import UserList from "./particals/leftbar/UserList.vue";
 import MessageWindow from "./particals/rightbar/MessageWindow.vue";
 import {store} from "./store";
+import axios from "../../../axios";
 
 export default {
   name: "ChatApp",
@@ -69,10 +70,42 @@ export default {
   data() {
     return {
       users: store.users,
-      selected_user: store.selected_user
+      selected_user: store.selected_user,
+      connection: null
     }
   },
-  methods: {}
+  methods: {
+    fetchUsers() {
+      axios.get('authentication/users/').then(response => {
+        // store.users = response.data
+        this.users = response.data
+        console.log(response.data)
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+  },
+  mounted() {
+    this.fetchUsers()
+  },
+  created() {
+    this.connection = new WebSocket(`${import.meta.env.VITE_WS_ENDPOINT}ws/notification/`)
+
+    this.connection.onmessage = (event) => {
+      let message = JSON.parse(event.data).message;
+      if (JSON.parse(event.data).status === 'new_user') {
+        this.users.push(message)
+      } else {
+        this.users.filter(value => {
+          if (value.username === message.username) value.online = message.online
+        })
+      }
+    }
+
+    this.connection.onopen = (event) => {
+      console.log("Created", event)
+    }
+  }
 }
 </script>
 

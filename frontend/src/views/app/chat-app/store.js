@@ -21,20 +21,6 @@ export const store = reactive({
                     sender_id: 'him'
                 }
             ]
-        },
-        {
-            name: 'K M Rifat',
-            photo: '/src/assets/icons/girl.svg',
-            online: true,
-            status: "hi there",
-            messages: [
-                {
-                    text: 'This is message',
-                    read: true,
-                    date_time: 'Yesterday',
-                    sender_id: 'him'
-                }
-            ]
         }
     ],
     selected_user: null
