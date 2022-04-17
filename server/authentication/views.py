@@ -24,29 +24,33 @@ from authentication.serializers import RegistrationSerializer, UserSerializer
 class Login(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
+        """
+
+        @param request:
+        @param args:
+        @param kwargs:
+        @return:
+        """
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-        self.__notify_user(user)
+        self.__change_status(user)
         serialize_user = UserSerializer(user, many=False, context={'request': request})
         return Response({
             'token': token.key,
             'user': serialize_user.data,
         })
 
-    def __notify_user(self, user: User):
+    def __change_status(self, user: User):
+        """
+
+        @param user:
+        """
         profile = user.profile
         profile.online = True
         profile.save()
-        serializer = UserSerializer(user, many=False)
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'notification', {
-                'type': 'user_online',
-                'message': serializer.data
-            }
-        )
+        notify_others(user)
 
 
 class RegisterView(CreateAPIView):
@@ -57,7 +61,6 @@ class RegisterView(CreateAPIView):
 
 
 class UserView(generics.ListAPIView):
-    # queryset = User.objects.all()
     serializer_class = UserSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -73,18 +76,24 @@ class LogOutView(APIView):
         profile = request.user.profile
         profile.online = False
         profile.save()
-        self.__notify_others(request.user)
+        notify_others(request.user)
         return Response({'message': 'logout'})
 
-    def __notify_others(self, user):
-        serializer = UserSerializer(user, many=False)
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'notification', {
-                'type': 'user_online',
-                'message': serializer.data
-            }
-        )
+
+def notify_others(user: User):
+    """
+
+    @param user:
+    @return:
+    """
+    serializer = UserSerializer(user, many=False)
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'notification', {
+            'type': 'user_online',
+            'message': serializer.data
+        }
+    )
 
 
 def test_socket(request):
