@@ -71,7 +71,8 @@ export default {
     return {
       users: store.users,
       selected_user: store.selected_user,
-      connection: null
+      connection: null,
+      message_connection: null
     }
   },
   methods: {
@@ -90,6 +91,7 @@ export default {
   },
   created() {
     this.connection = new WebSocket(`${import.meta.env.VITE_WS_ENDPOINT}ws/notification/`)
+    this.message_connection = new WebSocket(`${import.meta.env.VITE_WS_ENDPOINT}ws/message/${this.$store.state.activeUser.username}/`)
 
     this.connection.onmessage = (event) => {
       let message = JSON.parse(event.data).message;
@@ -100,6 +102,15 @@ export default {
           if (value.username === message.username) value.online = message.online
         })
       }
+    }
+
+    this.message_connection.onmessage = (event) => {
+      let message = JSON.parse(event.data).message
+      console.log(message)
+      let user = this.users.filter(value => {
+        return value.username === message.sender
+      })[0]
+      user.messages.push(message)
     }
 
     this.connection.onopen = (event) => {

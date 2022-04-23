@@ -9,7 +9,7 @@
           <img class="align-self-center rounded-circle"
                src="http://themesbox.in/admin-templates/gappa/html/light/assets/images/girl.svg" alt="User Image">
           <div class="media-body">
-            <h5>{{ user.name }} <span class="chat-timing">{{ user.messages[0]?.date_time }}</span></h5>
+            <h5>{{ user.name }} <span class="chat-timing">{{ dateHumanize(user.messages[0]?.date_time) }}</span></h5>
             <p>{{ user.status }}</p>
           </div>
         </div>
@@ -20,6 +20,7 @@
 
 <script>
 import {store} from "../../store";
+import moment from "moment";
 
 export default {
   name: "UserList",
@@ -32,7 +33,10 @@ export default {
   methods: {
     setSelectedUser(user) {
       this.$emit('update:modelValue', user)
-    }
+    },
+    dateHumanize(date) {
+      return moment(date).fromNow()
+    },
   }
 }
 </script>

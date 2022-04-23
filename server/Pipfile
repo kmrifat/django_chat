@@ -13,6 +13,7 @@ markdown = "*"
 django-filter = "*"
 channels-redis = "*"
 django-cors-headers = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 

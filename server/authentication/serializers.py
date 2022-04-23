@@ -1,20 +1,52 @@
+import datetime
+
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from rest_framework import serializers, status
-from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import NotFound
-from rest_framework.generics import get_object_or_404
+from django.db.models import Q
+from rest_framework import serializers
 
-from authentication.models import Profile
+from authentication.models import Message
 
 
 class MessageSerializer(serializers.Serializer):
     text = serializers.CharField()
-    read = serializers.BooleanField()
-    date_time = serializers.DateTimeField()
-    sender_id = serializers.IntegerField()
+    read = serializers.BooleanField(read_only=True)
+    date_time = serializers.DateTimeField(required=False)
+    sender_id = serializers.IntegerField(read_only=True)
+    receiver = serializers.SlugField(write_only=True)
+
+    def create(self, validated_data):
+        try:
+            user = User.objects.get(username=validated_data['receiver'])
+            message = Message()
+            message.text = validated_data['text']
+            message.sender = self.context['request'].user
+            message.receiver = user
+            message.save()
+            self.__broadcast(message)
+            return validated_data
+        except Exception as e:
+            raise Exception('Error', e)
+
+    def __broadcast(self, message: Message):
+        serializer = MessageModelSerializer(message, many=False)
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'chat_%s' % message.receiver.username, {
+                'type': 'new_message',
+                'message': serializer.data
+            }
+        )
+
+
+class MessageModelSerializer(serializers.ModelSerializer):
+    sender = serializers.CharField(read_only=True, source='sender.username')
+
+    class Meta:
+        model = Message
+        fields = ('text', 'sender', 'date_time')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,7 +66,12 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.username
 
     def get_messages(self, obj):
-        return []
+        print("This obj", obj, "auth user", self.context['request'].user)
+        messages = Message.objects.filter(
+            Q(receiver=obj, sender=self.context['request'].user) |
+            Q(sender=obj, receiver=self.context['request'].user)).prefetch_related('sender', 'receiver')
+        serializer = MessageModelSerializer(messages.order_by('date_time'), many=True)
+        return serializer.data
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

@@ -5,12 +5,12 @@
 
     <div class="chat-body" ref="chatBody">
       <div v-for="message in selected_user.messages" class="chat-message"
-           :class="message.sender_id === 'me' ? 'right': 'left'">
+           :class="message.sender !== selected_user.username ? 'right': 'left'">
         <div class="text">
           <span>{{ message.text }}</span>
         </div>
         <div class="meta">
-          <span>{{ message.date_time }}</span>
+          <span>{{ dateHumanize(message.date_time) }}</span>
           <i class="feather icon-check ml-2"></i>
         </div>
       </div>
@@ -42,6 +42,8 @@
 
 <script>
 import ActiveUser from "./ActiveUser.vue";
+import axios from "../../../../../axios";
+import moment from "moment";
 
 export default {
   name: "MessageWindow",
@@ -62,8 +64,22 @@ export default {
         date_time: 'now',
         sender_id: 'me'
       })
-      this.message = ''
+
       this.scrollDown()
+      axios.post('authentication/message/', {
+        text: this.message,
+        receiver: this.selected_user.username
+      }).then(response => {
+        console.log(response)
+      }).catch(error => {
+        console.log(error)
+      }).finally(e => {
+        this.message = ''
+      })
+    },
+
+    dateHumanize(date) {
+      return moment(date).fromNow()
     },
 
     scrollDown() {

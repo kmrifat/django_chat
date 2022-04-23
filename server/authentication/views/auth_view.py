@@ -7,6 +7,7 @@ from django.core import serializers
 from django.http import HttpResponse
 
 # Create your views here.
+from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication, SessionAuthentication
 from rest_framework.authtoken.models import Token
@@ -97,13 +98,14 @@ def notify_others(user: User):
 
 
 def test_socket(request):
-    user = User.objects.get(id=1)
-    serializer = UserSerializer(user, many=False)
+    # users = User.objects.all()
+    # return render(request, template_name='test.html', context={'users': users})
+    # serializer = UserSerializer(user, many=False)
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        'notification', {
-            'type': 'new_user_notification',
-            'message': serializer.data
+        'chat_rifat', {
+            'type': 'new_message',
+            'message': "Hello"
         }
     )
     return HttpResponse("hello world")
