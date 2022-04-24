@@ -104,8 +104,11 @@ def test_socket(request):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         'chat_rifat', {
-            'type': 'new_message',
-            'message': "Hello"
+            'type': 'new_call',
+            'message': {
+                'receiver': 'ritu',
+                'sender': 'rifat'
+            }
         }
     )
     return HttpResponse("hello world")

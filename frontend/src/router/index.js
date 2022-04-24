@@ -17,7 +17,12 @@ const routes = [
     {
         path: '/app', component: () => import('../views/app/Layout.vue'),
         children: [
-            {path: '', component: () => import('../views/app/chat-app/ChatApp.vue')}
+            {path: '', component: () => import('../views/app/chat-app/ChatApp.vue')},
+            {
+                path: '/call-view/:receiver',
+                component: () => import('../views/app/chat-app/CallView.vue'),
+                name: 'callView'
+            }
         ],
         meta: {
             auth: true

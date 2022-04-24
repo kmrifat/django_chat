@@ -22,7 +22,7 @@
           </li>
 
           <li class="list-inline-item">
-            <button type="button" class="">
+            <button @click="makeCall" type="button" class="">
               <img src="/src/assets/icons/video.svg" alt="">
             </button>
           </li>
@@ -41,7 +41,25 @@
 <script>
 export default {
   name: "ActiveUser",
-  props: ['user']
+  props: ['user'],
+  methods: {
+    makeCall() {
+      let routeData = this.$router.resolve({
+        name: 'callView',
+        params: {receiver: this.user.username},
+        query: {
+          sender: JSON.stringify(this.$store.state.activeUser),
+          receiver: JSON.stringify({
+            'username': this.user.username,
+            'name': this.user.name,
+            'photo': this.user.photo
+          })
+        }
+      });
+      window.open(routeData.href, '_blank', 'popup,height=450,width=350,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
+
+    }
+  }
 }
 </script>
 

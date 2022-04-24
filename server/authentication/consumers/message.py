@@ -32,6 +32,13 @@ class MessageConsumer(WebsocketConsumer):
             'status': 'new_message'
         }))
 
+    def new_call(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'status': 'new_call'
+        }))
+
     def disconnect(self, code):
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,

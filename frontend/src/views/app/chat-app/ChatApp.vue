@@ -84,6 +84,16 @@ export default {
       }).catch(error => {
         console.log(error)
       })
+    },
+
+    openCallViewWindow(data) {
+      let routeData = this.$router.resolve({
+        name: 'callView', params: {receiver: data.receiver}, query: {
+          sender: '',
+          receiver: ''
+        }
+      })
+      window.open(routeData.href, '_blank', 'popup,height=450,width=350,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
     }
   },
   mounted() {
@@ -105,12 +115,17 @@ export default {
     }
 
     this.message_connection.onmessage = (event) => {
-      let message = JSON.parse(event.data).message
-      console.log(message)
-      let user = this.users.filter(value => {
-        return value.username === message.sender
-      })[0]
-      user.messages.push(message)
+      let eventJSON = JSON.parse(event.data)
+      if (eventJSON.status === 'new_call') {
+        this.openCallViewWindow(eventJSON.message)
+      } else {
+        let message = JSON.parse(event.data).message
+        console.log(message)
+        let user = this.users.filter(value => {
+          return value.username === message.sender
+        })[0]
+        user.messages.push(message)
+      }
     }
 
     this.connection.onopen = (event) => {
