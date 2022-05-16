@@ -1,10 +1,12 @@
 import {createStore} from "vuex";
 import createPersistedState from 'vuex-persistedstate';
+import {Peer} from "peerjs";
 
 const store = createStore({
     state: {
         activeUser: null,
-        token: null
+        token: null,
+        peer_id: null
     },
     plugins: [createPersistedState()],
     mutations: {
@@ -13,12 +15,21 @@ const store = createStore({
         },
         SET_TOKEN(state, payload) {
             state.token = payload
+        },
+        SET_PEER(state, payload) {
+            state.peer_id = payload
         }
     },
     actions: {
         clearState(context) {
             context.commit('UPDATE_USER')
             context.commit('SET_TOKEN')
+        },
+        generatePeerId(context) {
+            const peer = new Peer()
+            peer.on('open', (id) => {
+                context.commit('SET_PEER', id)
+            })
         }
     }
 })

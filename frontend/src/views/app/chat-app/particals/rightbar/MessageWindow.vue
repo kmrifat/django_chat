@@ -83,6 +83,9 @@ export default {
     },
 
     scrollDown() {
+      // let scrollHeight = this.$refs.chatBody.scrollHeight
+      // this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight + 500
+      // chatBody.scrollTo = chatBody.scrollHeight
       // this.$refs.chatBody.scrollTo(0, this.$refs.chatBody.scrollHeight)
     }
   },

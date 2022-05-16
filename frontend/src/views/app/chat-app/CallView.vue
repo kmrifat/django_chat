@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import axios from "../../../axios";
+
 export default {
   name: "CallView",
   data() {
@@ -30,6 +32,17 @@ export default {
   mounted() {
     this.receiver = JSON.parse(this.$route.query.receiver)
     this.sender = JSON.parse(this.$route.query.sender)
+    axios.post('authentication/start-call/', {
+      receiver: this.receiver.username,
+      sender: this.sender.username
+    }).then(response => {
+      console.log(response)
+    }).catch(error => {
+      console.log(error.response)
+    })
+
+    console.log(this.sender)
+    console.log(this.receiver)
     // TODO: generate peer id
     // TODO: send the peer it to server using ajax
     // TODO: implement websocket

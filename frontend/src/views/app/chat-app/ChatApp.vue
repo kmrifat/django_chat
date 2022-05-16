@@ -98,6 +98,7 @@ export default {
   },
   mounted() {
     this.fetchUsers()
+    this.$store.dispatch('generatePeerId')
   },
   created() {
     this.connection = new WebSocket(`${import.meta.env.VITE_WS_ENDPOINT}ws/notification/`)

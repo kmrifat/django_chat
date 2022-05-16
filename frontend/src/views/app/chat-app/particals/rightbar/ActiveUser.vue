@@ -16,7 +16,7 @@
       <div class="col-6">
         <ul class="list-inline float-end mb-0">
           <li class="list-inline-item">
-            <button type="button" class="">
+            <button @click="makeCall" type="button" class="">
               <img src="/src/assets/icons/phone.svg" alt="">
             </button>
           </li>
