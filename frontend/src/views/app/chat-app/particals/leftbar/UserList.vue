@@ -10,7 +10,8 @@
                src="http://themesbox.in/admin-templates/gappa/html/light/assets/images/girl.svg" alt="User Image">
           <div class="media-body">
             <h5>{{ user.name }} <span class="chat-timing">{{ dateHumanize(user.messages[0]?.date_time) }}</span></h5>
-            <p>{{ user.status }}</p>
+            <p v-if="!user.messages.length">{{ user.status }}</p>
+            <p v-else>{{user.messages.slice(-1)[0].text}}</p>
           </div>
         </div>
       </a>
