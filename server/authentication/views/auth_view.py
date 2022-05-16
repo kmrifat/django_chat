@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.authentication import BearerAuthentication
-from authentication.serializers import RegistrationSerializer, UserSerializer
+from authentication.serializers import RegistrationSerializer, UsersWithMessageSerializer, UserSerializer
 
 
 class Login(ObtainAuthToken):
@@ -37,7 +37,7 @@ class Login(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         self.__change_status(user)
-        serialize_user = UserSerializer(user, many=False, context={'request': request})
+        serialize_user = UserSerializer(user, many=False)
         return Response({
             'token': token.key,
             'user': serialize_user.data,
@@ -45,7 +45,6 @@ class Login(ObtainAuthToken):
 
     def __change_status(self, user: User):
         """
-
         @param user:
         """
         profile = user.profile
@@ -58,20 +57,12 @@ class RegisterView(CreateAPIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-
-class UserView(generics.ListAPIView):
-    serializer_class = UserSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        users = User.objects.exclude(pk=self.request.user.pk).all()
-        return users
+        super(RegisterView, self).post(request, *args, **kwargs)
+        return Response({'message': 'Registration success, now you can login'})
 
 
 class LogOutView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
 
     def post(self, request, format=None):
         profile = request.user.profile
@@ -79,6 +70,16 @@ class LogOutView(APIView):
         profile.save()
         notify_others(request.user)
         return Response({'message': 'logout'})
+
+
+class UsersView(generics.ListAPIView):
+    serializer_class = UsersWithMessageSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        users = User.objects.exclude(pk=self.request.user.pk).all()
+        return users
 
 
 def notify_others(user: User):

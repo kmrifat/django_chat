@@ -14,17 +14,17 @@
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" v-model="user.first_name" placeholder="name@example.com">
+      <input type="text" class="form-control" v-model="user.first_name" placeholder="First Name">
       <label>First Name</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="text" class="form-control" v-model="user.last_name" placeholder="name@example.com">
+      <input type="text" class="form-control" v-model="user.last_name" placeholder="Last Name">
       <label>Last Name</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input type="password" class="form-control" v-model="user.password" placeholder="Password">
+      <input type="password" autocomplete="false" class="form-control" v-model="user.password" placeholder="Password">
       <label>Password</label>
     </div>
 
@@ -41,6 +41,7 @@
 
 <script>
 import axios from "../../axios";
+import toastr from 'toastr'
 
 export default {
   name: "Registration",
@@ -52,16 +53,21 @@ export default {
         last_name: '',
         password: ''
       },
-      error: null
+      error: []
     }
   },
   methods: {
     async register() {
       await axios.post('/authentication/registration/', this.user).then(response => {
-        console.log(response.data)
-        // this.$router.replace('/')
+        console.log(response)
+        toastr.success(response.data.message, 'Success')
+        this.$router.replace('/')
       }).catch(error => {
+        console.log(error.response)
         this.error = error.response.data
+        for (let err in error.response.data) {
+          toastr.error(error.response.data[err], err)
+        }
       })
 
     }

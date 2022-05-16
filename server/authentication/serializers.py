@@ -49,7 +49,7 @@ class MessageModelSerializer(serializers.ModelSerializer):
         fields = ('text', 'sender', 'date_time')
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UsersWithMessageSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     photo = serializers.ImageField(source='profile.photo')
     online = serializers.BooleanField(source='profile.online')
@@ -72,6 +72,26 @@ class UserSerializer(serializers.ModelSerializer):
             Q(sender=obj, receiver=self.context['request'].user)).prefetch_related('sender', 'receiver')
         serializer = MessageModelSerializer(messages.order_by('date_time'), many=True)
         return serializer.data
+
+
+class UserSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    photo = serializers.ImageField(source='profile.photo')
+    online = serializers.BooleanField(source='profile.online')
+    status = serializers.CharField(source='profile.status')
+    messages = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('name', 'username', 'photo', 'online', 'status', 'messages')
+
+    def get_name(self, obj):
+        if obj.first_name:
+            return obj.get_full_name()
+        return obj.username
+
+    def get_messages(self, obj):
+        return []
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
