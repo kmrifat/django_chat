@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.authentication import BearerAuthentication
-from authentication.serializers import RegistrationSerializer, UserSerializer
+from authentication.serializers import RegistrationSerializer, UsersWithMessageSerializer, UserSerializer
 
 
 class Login(ObtainAuthToken):
@@ -37,7 +37,7 @@ class Login(ObtainAuthToken):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         self.__change_status(user)
-        serialize_user = UserSerializer(user, many=False, context={'request': request})
+        serialize_user = UserSerializer(user, many=False)
         return Response({
             'token': token.key,
             'user': serialize_user.data,
@@ -45,24 +45,34 @@ class Login(ObtainAuthToken):
 
     def __change_status(self, user: User):
         """
-
         @param user:
         """
         profile = user.profile
         profile.online = True
         profile.save()
-        notify_others(user)
 
 
 class RegisterView(CreateAPIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        super(RegisterView, self).post(request, *args, **kwargs)
+        return Response({'message': 'Registration success, now you can login'})
 
 
-class UserView(generics.ListAPIView):
-    serializer_class = UserSerializer
+class LogOutView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
+
+    def post(self, request, format=None):
+        profile = request.user.profile
+        profile.online = False
+        profile.save()
+        notify_others(request.user, request)
+        return Response({'message': 'logout'})
+
+
+class UsersView(generics.ListAPIView):
+    serializer_class = UsersWithMessageSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -71,23 +81,13 @@ class UserView(generics.ListAPIView):
         return users
 
 
-class LogOutView(APIView):
-
-    def post(self, request, format=None):
-        profile = request.user.profile
-        profile.online = False
-        profile.save()
-        notify_others(request.user)
-        return Response({'message': 'logout'})
-
-
-def notify_others(user: User):
+def notify_others(user: User, request):
     """
 
     @param user:
     @return:
     """
-    serializer = UserSerializer(user, many=False)
+    serializer = UserSerializer(user, many=False, context={'request': request})
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         'notification', {

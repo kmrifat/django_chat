@@ -11,7 +11,7 @@ urlpatterns = [
     path('login/', Login.as_view()),
     path('registration/', RegisterView.as_view()),
     path('logout/', LogOutView.as_view()),
-    path('users/', UserView.as_view()),
+    path('users/', UsersView.as_view()),
     path('message/', MessageView.as_view()),
     path('test-socket/', test_socket)
 ]
