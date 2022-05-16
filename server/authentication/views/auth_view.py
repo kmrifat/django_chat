@@ -50,6 +50,7 @@ class Login(ObtainAuthToken):
         profile = user.profile
         profile.online = True
         profile.save()
+        notify_others(user)
 
 
 class RegisterView(CreateAPIView):
@@ -67,7 +68,7 @@ class LogOutView(APIView):
         profile = request.user.profile
         profile.online = False
         profile.save()
-        notify_others(request.user, request)
+        notify_others(request.user)
         return Response({'message': 'logout'})
 
 
@@ -81,13 +82,13 @@ class UsersView(generics.ListAPIView):
         return users
 
 
-def notify_others(user: User, request):
+def notify_others(user: User):
     """
 
     @param user:
     @return:
     """
-    serializer = UserSerializer(user, many=False, context={'request': request})
+    serializer = UserSerializer(user, many=False)
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         'notification', {
