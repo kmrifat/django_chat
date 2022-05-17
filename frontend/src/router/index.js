@@ -19,10 +19,20 @@ const routes = [
         children: [
             {path: '', component: () => import('../views/app/chat-app/ChatApp.vue')},
             {
-                path: '/call-view/:receiver',
-                component: () => import('../views/app/chat-app/CallView.vue'),
-                name: 'callView'
-            }
+                path: "/call-view", component: () => import('../views/app/call-app/BaseCallView.vue'),
+                children: [
+                    {
+                        name: 'callerView',
+                        path: 'sender/:username/:receiver',
+                        component: () => import('../views/app/call-app/Sender.vue')
+                    },
+                    {
+                        path: 'receiver/:username/:sender',
+                        name: 'receiverView',
+                        component: () => import('../views/app/call-app/Receiver.vue')
+                    },
+                ]
+            },
         ],
         meta: {
             auth: true

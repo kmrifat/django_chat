@@ -45,19 +45,17 @@ export default {
   methods: {
     makeCall() {
       let routeData = this.$router.resolve({
-        name: 'callView',
-        params: {receiver: this.user.username},
+        name: 'callerView',
+        params: {
+          username: this.$store.state.activeUser.username,
+          receiver: this.user.username,
+        },
         query: {
-          sender: JSON.stringify(this.$store.state.activeUser),
-          receiver: JSON.stringify({
-            'username': this.user.username,
-            'name': this.user.name,
-            'photo': this.user.photo
-          })
+          display: JSON.stringify(this.user)
         }
       });
-      window.open(routeData.href, '_blank', 'popup,height=450,width=350,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
-
+      window.open(routeData.href, '_blank', 'popup,height=650,width=550,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
+      // window.open(routeData.href, '_blank')
     }
   }
 }

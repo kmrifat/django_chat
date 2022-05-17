@@ -88,12 +88,13 @@ export default {
 
     openCallViewWindow(data) {
       let routeData = this.$router.resolve({
-        name: 'callView', params: {receiver: data.receiver}, query: {
-          sender: '',
-          receiver: ''
+        name: 'receiverView',
+        params: {username: data.receiver, sender: data.sender},
+        query: {
+          display: JSON.stringify(data.display)
         }
       })
-      window.open(routeData.href, '_blank', 'popup,height=450,width=350,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
+      window.open(routeData.href, '_blank', 'popup,height=650,width=550,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
     }
   },
   mounted() {
