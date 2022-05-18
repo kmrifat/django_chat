@@ -3,7 +3,7 @@ from django.urls import path
 from authentication.views.auth_view import *
 from rest_framework.authtoken import views
 
-from authentication.views.call_view import StartCall
+from authentication.views.call_view import StartCall, JoinCall
 from authentication.views.message_view import MessageView
 from config import settings
 
@@ -15,5 +15,6 @@ urlpatterns = [
     path('users/', UsersView.as_view()),
     path('message/', MessageView.as_view()),
     path('start-call/', StartCall.as_view()),
+    path('join-call/', JoinCall.as_view()),
     path('test-socket/', test_socket)
 ]

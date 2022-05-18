@@ -14,6 +14,7 @@ from authentication.serializers import UserSerializer
 class StartCallSerializer(serializers.Serializer):
     receiver = serializers.SlugField()
     sender = serializers.SlugField()
+    peer_id = serializers.CharField()
 
 
 class StartCall(APIView):
@@ -29,8 +30,7 @@ class StartCall(APIView):
                 'chat_%s' % serializer.validated_data['receiver'], {
                     'type': 'new_call',
                     'message': {
-                        'receiver': serializer.validated_data['receiver'],
-                        'sender': serializer.validated_data['sender'],
+                        'data': serializer.validated_data,
                         'display': UserSerializer(sender_user, context={'request': request}).data
                     }
                 }
@@ -38,3 +38,15 @@ class StartCall(APIView):
             print('all good')
             return Response({'hello': 'world'})
         return Response(serializer.errors)
+
+
+class JoinCallSerializer(serializers.Serializer):
+    peer_js = serializers.CharField()
+
+
+class JoinCall(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication, BearerAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        pass
