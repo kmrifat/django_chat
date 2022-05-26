@@ -51,11 +51,16 @@ export default {
           receiver: this.user.username,
         },
         query: {
-          display: JSON.stringify(this.user)
+          display: JSON.stringify({
+            username: this.user.username,
+            photo: this.user.photo,
+            name: this.user.name,
+            online: this.user.online
+          })
         }
       });
-      window.open(routeData.href, '_blank', 'popup,height=650,width=550,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
-      // window.open(routeData.href, '_blank')
+      // window.open(routeData.href, '_blank', 'popup,height=650,width=550,resizable=0,location=no,toolbar=no,menubar=no,resizable=no')
+      window.open(routeData.href, '_blank')
     }
   }
 }
