@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh" class="d-flex justify-content-center align-items-center">
-    <div class="text-center align-self-center">
+    <div class="text-center align-self-center" v-if="callingStatus === 'calling'">
       <center>
         <div class="pulse">
           <img height="250" :src="displayUser.photo"
@@ -11,6 +11,11 @@
       <h2 class="mt-5 text-black-50 mb-5">Calling <strong>{{ displayUser.name }}</strong> .....</h2>
       <button type="button" @click="cancelCall" class="btn btn-lg btn-danger rounded-pill">Cancel Call</button>
     </div>
+
+    <div v-if="callingStatus === 'connected'">
+      <h1>Connected video call</h1>
+    </div>
+
   </div>
 
 
@@ -32,15 +37,54 @@ export default {
       peer_id: null,
       user: null,
       peer: null,
-      conn: null
+      conn: null,
+      call: null,
+      callingStatus: 'calling', // there will three status : 101 calling, 400 => rejected,200 => connected
+      getUserMedia: navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia
     }
   },
   methods: {
+    initializePeer() {
+      this.peer = new Peer()
+      this.peer.on('open', (id) => {
+        this.peer_id = id
+        this.startCall()
+        console.log("My peer id", id)
+        console.log("My store id", this.$store.state.peer_id)
+      })
+
+      this.peer.on('connection', this.handleConnection)
+
+      this.peer.on('call', this.handleCall)
+    },
+
+    handleConnection(conn) {
+      this.conn = conn
+      this.conn.on('data', (data) => {
+        console.log("Received", data)
+      })
+    },
+
+    handleCall(call) {
+      this.call = call
+      this.getUserMedia({video: true, audio: true}, this.streamCall)
+    },
+
+    streamCall(stream) {
+      this.call.answer(stream)
+      this.call.on('stream', this.streamRemoteCall)
+    },
+
+    streamRemoteCall(remoteStream) {
+      this.callingStatus = "connected"
+      console.log("remote stream")
+    },
+
     startCall() {
       let data = {
         receiver: this.$route.params.receiver,
         sender: this.$route.params.username,
-        peer_id: this.$store.state.peer_id
+        peer_id: this.peer_id
       }
       console.log(this.$route.params)
       console.log(data)
@@ -50,44 +94,15 @@ export default {
         console.log(error.response)
       })
     },
-    ready() {
-      this.conn.on('data', (data) => {
-        console.log("Data recieved", data)
-      })
-
-      this.conn.on('close', () => {
-        console.log("Connection reset Awaiting connection")
-        this.conn = null
-      })
-    },
     cancelCall() {
-
+      console.log(this.conn)
     }
   },
   mounted() {
     this.displayUser = JSON.parse(this.$route.query.display)
-    this.peer = new Peer()
-    this.peer.on('open', (id) => {
-      this.peer_id = id;
-      this.$store.commit('SET_PEER', id)
-    })
+    this.initializePeer()
 
-    this.peer.on('connection', (conn) => {
-      this.conn = conn
-      console.log("hello connection", conn.peer)
-      this.ready()
-
-    })
-
-    this.peer.on('disconnected', () => {
-      console.log('Connection lost. Please reconnect');
-    })
-
-    this.peer.on('close', () => {
-      console.log('Connection destroyed');
-    })
-
-    this.startCall()
+    // this.startCall()
   }
 }
 </script>
