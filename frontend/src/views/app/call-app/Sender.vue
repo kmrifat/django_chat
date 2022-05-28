@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh" class="d-flex justify-content-center align-items-center">
-    <div class="text-center align-self-center" v-if="callingStatus === 'calling'">
+    <div class="text-center align-self-center" v-show="callingStatus === 'calling'">
       <center>
         <div class="pulse">
           <img height="250" :src="displayUser.photo"
@@ -9,11 +9,24 @@
         </div>
       </center>
       <h2 class="mt-5 text-black-50 mb-5">Calling <strong>{{ displayUser.name }}</strong> .....</h2>
-      <button type="button" @click="cancelCall" class="btn btn-lg btn-danger rounded-pill">Cancel Call</button>
+      <button type="button" @click="cancelCall" class="btn btn-lg btn-danger rounded-pill px-5">
+        <i class="fa-solid fa-phone" style="transform: rotate(133deg)"></i> Cancel Call
+      </button>
     </div>
 
-    <div v-if="callingStatus === 'connected'">
-      <h1>Connected video call</h1>
+    <div v-show="callingStatus === 'connected'">
+
+
+      <video ref="localVideo" src="" id="localVideo" autoplay="autoplay" muted></video>
+
+      <video ref="remoteVideo" src="" id="remoteVideo" autoplay muted></video>
+
+      <div class="call-controls text-center align-self-center p-3 bg-primary bg-opacity-10">
+        <button class="btn btn-lg btn-secondary rounded-circle mx-1"><i class="fa-solid fa-microphone"></i></button>
+        <button class="btn btn-lg btn-primary rounded-circle mx-1"><i class="fa-solid fa-video"></i></button>
+        <button class="btn btn-lg btn-danger rounded-circle mx-1"><i class="fa-solid fa-phone"
+                                                                     style="transform: rotate(133deg)"></i></button>
+      </div>
     </div>
 
   </div>
@@ -71,12 +84,16 @@ export default {
     },
 
     streamCall(stream) {
+      this.callingStatus = 'connected'
       this.call.answer(stream)
+      this.$refs.localVideo.srcObject = stream
+      this.$refs.localVideo.play()
       this.call.on('stream', this.streamRemoteCall)
     },
 
     streamRemoteCall(remoteStream) {
-      this.callingStatus = "connected"
+      this.$refs.remoteVideo.srcObject = remoteStream
+      this.$refs.remoteVideo.play()
       console.log("remote stream")
     },
 
@@ -103,6 +120,13 @@ export default {
     this.initializePeer()
 
     // this.startCall()
+  },
+  beforeMount() {
+    window.addEventListener('beforeunload', ev => {
+      if (this.peer_id)
+        ev.preventDefault()
+      ev.returnValue = ""
+    })
   }
 }
 </script>

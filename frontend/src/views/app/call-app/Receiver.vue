@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh" class="d-flex justify-content-center align-items-center">
-    <div class="text-center align-self-center" v-if="callingStatus === 'calling'">
+    <div class="text-center align-self-center" v-show="callingStatus === 'calling'">
       <center>
         <div class="pulse">
           <img height="250" :src="displayUser.photo"
@@ -9,13 +9,25 @@
         </div>
       </center>
 
-      <h1 class="mt-5 text-black-50 mb-5">Incoming call from {{ displayUser.name }}</h1>
-      <button type="button" @click="answerCall" class="btn btn-lg btn-success rounded-pill px-5 me-3">Answer</button>
-      <button type="button" @click="rejectCall" class="btn btn-lg btn-danger rounded-pill px-5">Reject</button>
+      <h1 class="mt-5 text-black-50 mb-5">Incoming call from <strong>{{ displayUser.name }}</strong></h1>
+      <button type="button" @click="answerCall" class="btn btn-lg btn-success rounded-pill px-5 me-3">
+        <i class="fa-solid fa-phone"></i> Answer
+      </button>
+      <button type="button" @click="rejectCall" class="btn btn-lg btn-danger rounded-pill px-5">
+        <i class="fa-solid fa-phone" style="transform: rotate(133deg)"></i> Reject</button>
     </div>
 
-    <div v-if="callingStatus === 'connected'">
-      <h1>Connected video call</h1>
+    <div v-show="callingStatus === 'connected'">
+      <video ref="localVideo" src="" id="localVideo" autoplay="autoplay" muted></video>
+
+      <video ref="remoteVideo" src="" id="remoteVideo" autoplay muted></video>
+
+      <div class="call-controls text-center align-self-center p-3 bg-primary bg-opacity-10">
+        <button class="btn btn-lg btn-secondary rounded-circle mx-1"><i class="fa-solid fa-microphone"></i></button>
+        <button class="btn btn-lg btn-primary rounded-circle mx-1"><i class="fa-solid fa-video"></i></button>
+        <button class="btn btn-lg btn-danger rounded-circle mx-1"><i class="fa-solid fa-phone"
+                                                                     style="transform: rotate(133deg)"></i></button>
+      </div>
     </div>
   </div>
 </template>
@@ -63,12 +75,16 @@ export default {
     },
 
     streamCall(stream) {
+      this.callingStatus = 'connected'
       this.call = this.peer.call(this.remote_peer_id, stream)
       this.call.on('stream', this.streamRemoteCall)
+      this.$refs.localVideo.srcObject = stream
+      this.$refs.localVideo.play()
     },
 
     streamRemoteCall(remoteStream) {
-      this.callingStatus = 'connected'
+      this.$refs.remoteVideo.srcObject = remoteStream
+      this.$refs.remoteVideo.play()
       console.log("remote stream")
     },
 
@@ -95,5 +111,7 @@ export default {
 </script>
 
 <style scoped>
-
+.rotate-90{
+  transform: rotate(45deg);
+}
 </style>
