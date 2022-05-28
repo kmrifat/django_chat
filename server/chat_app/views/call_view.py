@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from authentication.authentication import BearerAuthentication
-from authentication.serializers import UserSerializer
+from chat_app.authentication import BearerAuthentication
+from chat_app.serializers import UserSerializer
 
 
 class StartCallSerializer(serializers.Serializer):

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.generics import CreateAPIView
 
-from authentication.serializers import MessageModelSerializer, MessageSerializer
+from chat_app.serializers import MessageModelSerializer, MessageSerializer
 
 
 class MessageView(CreateAPIView):

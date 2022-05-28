@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from authentication.models import Profile
+from chat_app.models import Profile
 
 
 @admin.register(Profile)

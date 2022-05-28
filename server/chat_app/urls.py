@@ -1,10 +1,10 @@
 from django.urls import path
 
-from authentication.views.auth_view import *
+from chat_app.views.auth_view import *
 from rest_framework.authtoken import views
 
-from authentication.views.call_view import StartCall, JoinCall
-from authentication.views.message_view import MessageView
+from chat_app.views.call_view import StartCall, JoinCall
+from chat_app.views.message_view import MessageView
 from config import settings
 
 urlpatterns = [
