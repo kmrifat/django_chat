@@ -57,10 +57,10 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.chat_app.BasicAuthentication',
-        'rest_framework.chat_app.SessionAuthentication',
-        'rest_framework.chat_app.TokenAuthentication',
-        'chat_app.chat_app.BearerAuthentication'
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'chat_app.authentication.BearerAuthentication'
     ]
 }
 
