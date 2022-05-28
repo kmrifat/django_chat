@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     async login() {
-      await axios.post('authentication/login/', this.user).then(response => {
+      await axios.post('login/', this.user).then(response => {
         this.$store.commit('SET_TOKEN', response.data.token)
         this.$store.commit('UPDATE_USER', response.data.user)
         this.$router.replace({path: '/app'})

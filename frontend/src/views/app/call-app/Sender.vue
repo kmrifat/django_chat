@@ -105,7 +105,7 @@ export default {
       }
       console.log(this.$route.params)
       console.log(data)
-      axios.post('authentication/start-call/', data).then(response => {
+      axios.post('start-call/', data).then(response => {
         console.log(response)
       }).catch(error => {
         console.log(error.response)

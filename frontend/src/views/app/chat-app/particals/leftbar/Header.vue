@@ -30,7 +30,7 @@ export default {
   name: "Header",
   methods: {
     async logout() {
-      await axios.post('authentication/logout/').then(response => {
+      await axios.post('logout/').then(response => {
         this.$store.dispatch('clearState')
         this.$router.replace('/')
       }).catch(error => {

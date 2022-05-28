@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     async register() {
-      await axios.post('/authentication/registration/', this.user).then(response => {
+      await axios.post('registration/', this.user).then(response => {
         console.log(response)
         toastr.success(response.data.message, 'Success')
         this.$router.replace('/')

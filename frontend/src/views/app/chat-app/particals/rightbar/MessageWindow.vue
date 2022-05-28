@@ -66,7 +66,7 @@ export default {
       })
 
       this.scrollDown()
-      axios.post('authentication/message/', {
+      axios.post('message/', {
         text: this.message,
         receiver: this.selected_user.username
       }).then(response => {
