@@ -57,10 +57,12 @@
   width: 100vw;
   height: 100vh;
   object-fit: contain;
+  transform: rotateY(180deg);
 }
 
 #localVideo {
   position: fixed;
+  transform: rotateY(180deg);
   right: 0;
   top: 0;
   width: 20vw;

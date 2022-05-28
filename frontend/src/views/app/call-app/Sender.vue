@@ -17,15 +17,17 @@
     <div v-show="callingStatus === 'connected'">
 
 
-      <video ref="localVideo" src="" id="localVideo" autoplay="autoplay" muted></video>
+      <video ref="localVideo" src="" id="localVideo" autoplay="autoplay"></video>
 
-      <video ref="remoteVideo" src="" id="remoteVideo" autoplay muted></video>
+      <video ref="remoteVideo" src="" id="remoteVideo" autoplay></video>
 
       <div class="call-controls text-center align-self-center p-3 bg-primary bg-opacity-10">
-        <button class="btn btn-lg btn-secondary rounded-circle mx-1"><i class="fa-solid fa-microphone"></i></button>
-        <button class="btn btn-lg btn-primary rounded-circle mx-1"><i class="fa-solid fa-video"></i></button>
-        <button class="btn btn-lg btn-danger rounded-circle mx-1"><i class="fa-solid fa-phone"
-                                                                     style="transform: rotate(133deg)"></i></button>
+        <mic-button :click-callback="toggleLocalAudio"></mic-button>
+        <video-button :click-callback="toggleLocalVideo"></video-button>
+
+        <button class="btn btn-lg btn-danger rounded-circle mx-1">
+          <i class="fa-solid fa-phone" style="transform: rotate(133deg)"></i>
+        </button>
       </div>
     </div>
 
@@ -37,9 +39,15 @@
 <script>
 import axios from "../../../axios";
 import {Peer} from "peerjs"
+import MicButton from "../../../components/buttons/MicButton.vue";
+import VideoButton from "../../../components/buttons/VideoButton.vue";
 
 export default {
   name: "Sender",
+  components: {
+    'mic-button': MicButton,
+    'video-button': VideoButton
+  },
   data() {
     return {
       displayUser: {
@@ -48,10 +56,10 @@ export default {
         photo: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
       },
       peer_id: null,
-      user: null,
       peer: null,
       conn: null,
       call: null,
+      localStream: null,
       callingStatus: 'calling', // there will three status : 101 calling, 400 => rejected,200 => connected
       getUserMedia: navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia
     }
@@ -69,6 +77,10 @@ export default {
       this.peer.on('connection', this.handleConnection)
 
       this.peer.on('call', this.handleCall)
+
+      this.peer.on('error', (data) => {
+        console.log('peer errors')
+      })
     },
 
     handleConnection(conn) {
@@ -86,6 +98,7 @@ export default {
     streamCall(stream) {
       this.callingStatus = 'connected'
       this.call.answer(stream)
+      this.localStream = stream
       this.$refs.localVideo.srcObject = stream
       this.$refs.localVideo.play()
       this.call.on('stream', this.streamRemoteCall)
@@ -111,6 +124,23 @@ export default {
         console.log(error.response)
       })
     },
+
+    toggleLocalVideo() {
+      this.localStream.getTracks().forEach((track) => {
+        if (track.readyState === 'live' && track.kind === 'video') {
+          track.enabled = !track.enabled;
+        }
+      })
+    },
+
+    toggleLocalAudio() {
+      this.localStream.getTracks().forEach((track) => {
+        if (track.readyState === 'live' && track.kind === 'audio') {
+          track.enabled = !track.enabled;
+        }
+      })
+    },
+
     cancelCall() {
       console.log(this.conn)
     }

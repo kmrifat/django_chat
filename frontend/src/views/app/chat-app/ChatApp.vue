@@ -87,6 +87,7 @@ export default {
     },
 
     openCallViewWindow(data) {
+      console.log("openCallViewWindow", data)
       let routeData = this.$router.resolve({
         name: 'receiverView',
         params: {username: data.data.receiver, sender: data.data.sender},
@@ -121,6 +122,7 @@ export default {
     this.message_connection.onmessage = (event) => {
       let eventJSON = JSON.parse(event.data)
       if (eventJSON.status === 'new_call') {
+        console.log("new call")
         this.openCallViewWindow(eventJSON.message)
       } else {
         let message = JSON.parse(event.data).message
