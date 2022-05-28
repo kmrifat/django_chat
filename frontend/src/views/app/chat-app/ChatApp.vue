@@ -77,7 +77,7 @@ export default {
   },
   methods: {
     fetchUsers() {
-      axios.get('authentication/users/').then(response => {
+      axios.get('users/').then(response => {
         // store.users = response.data
         this.users = response.data
         console.log(response.data)
