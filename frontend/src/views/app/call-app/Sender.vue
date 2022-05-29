@@ -25,10 +25,14 @@
         <mic-button :click-callback="toggleLocalAudio"></mic-button>
         <video-button :click-callback="toggleLocalVideo"></video-button>
 
-        <button class="btn btn-lg btn-danger rounded-circle mx-1">
+        <button @click="cancelCall" class="btn btn-lg btn-danger rounded-circle mx-1">
           <i class="fa-solid fa-phone" style="transform: rotate(133deg)"></i>
         </button>
       </div>
+    </div>
+
+    <div v-if="callingStatus === 'rejected'">
+      <h1>Call Rejected, closing the window</h1>
     </div>
 
   </div>
@@ -55,6 +59,7 @@ export default {
         name: '',
         photo: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
       },
+      socket: null,
       peer_id: null,
       peer: null,
       conn: null,
@@ -70,6 +75,7 @@ export default {
       this.peer.on('open', (id) => {
         this.peer_id = id
         this.startCall()
+        this.initializeWebSocket(id)
         console.log("My peer id", id)
         console.log("My store id", this.$store.state.peer_id)
       })
@@ -142,13 +148,41 @@ export default {
     },
 
     cancelCall() {
-      console.log(this.conn)
+      let data = {
+        receiver: this.$route.params.receiver,
+        sender: this.$route.params.username,
+        peer_id: this.peer_id
+      }
+      axios.post('end-call/', data).then(response => {
+        console.log(response)
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
+    initializeWebSocket(peer_id) {
+      this.socket = new WebSocket(`${import.meta.env.VITE_WS_ENDPOINT}ws/message/${peer_id}/`)
+      this.socket.onmessage = (event) => {
+        let message = JSON.parse(event.data);
+        switch (message.status) {
+          case 'end_call':
+            this.endCall()
+            break
+        }
+        console.log(message)
+      }
+    },
+
+    endCall() {
+      this.callingStatus = 'rejected'
+      setTimeout(() => {
+        window.close()
+      }, 2000)
     }
   },
   mounted() {
     this.displayUser = JSON.parse(this.$route.query.display)
     this.initializePeer()
-
     // this.startCall()
   },
   beforeMount() {

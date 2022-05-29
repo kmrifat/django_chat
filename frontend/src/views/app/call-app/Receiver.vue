@@ -31,6 +31,10 @@
         </button>
       </div>
     </div>
+
+    <div v-if="callingStatus === 'rejected'">
+      <h1>Call Rejected, closing the window</h1>
+    </div>
   </div>
 </template>
 
@@ -38,6 +42,7 @@
 import Peer from "peerjs";
 import MicButton from "../../../components/buttons/MicButton.vue";
 import VideoButton from "../../../components/buttons/VideoButton.vue";
+import axios from "../../../axios";
 
 export default {
   name: "Receiver",
@@ -47,6 +52,7 @@ export default {
   },
   data() {
     return {
+      socket: null,
       peer: null,
       conn: null,
       call: null,
@@ -75,6 +81,8 @@ export default {
           console.log("recieved", data)
         })
       })
+
+      this.initializeWebSocket(this.remote_peer_id)
     },
 
     answerCall() {
@@ -116,15 +124,37 @@ export default {
     },
 
     rejectCall() {
-      this.conn = this.peer.connect(this.remote_peer_id)
-      this.conn.on('open', () => {
-        this.conn.send({
-          status: 400,
-          statusText: 'rejected',
-          data: `${this.$store.state.activeUser.name} Has declined your call`
-        })
+      let data = {
+        receiver: this.displayUser.username,
+        sender: this.$route.params.username,
+        peer_id: this.remote_peer_id
+      }
+      axios.post('end-call/', data).then(response => {
+        console.log(response)
+      }).catch(err => {
+        console.log(err)
       })
     },
+
+    initializeWebSocket(peer_id) {
+      this.socket = new WebSocket(`${import.meta.env.VITE_WS_ENDPOINT}ws/message/${peer_id}/`)
+      this.socket.onmessage = (event) => {
+        let message = JSON.parse(event.data);
+        switch (message.status) {
+          case 'end_call':
+            this.endCall()
+            break
+        }
+        console.log(message)
+      }
+    },
+
+    endCall() {
+      this.callingStatus = 'rejected'
+      setTimeout(() => {
+        window.close()
+      }, 2000)
+    }
   },
   mounted() {
     this.displayUser = JSON.parse(this.$route.query.display)

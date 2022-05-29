@@ -6,7 +6,8 @@ const store = createStore({
     state: {
         activeUser: null,
         token: null,
-        peer_id: null
+        peer_id: null,
+        active_message: null
     },
     plugins: [createPersistedState()],
     mutations: {
@@ -18,6 +19,9 @@ const store = createStore({
         },
         SET_PEER(state, payload) {
             state.peer_id = payload
+        },
+        SET_ACTIVE_MESSAGE(state, payload) {
+            state.active_message = payload
         }
     },
     actions: {
