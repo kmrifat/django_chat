@@ -187,6 +187,7 @@ export default {
   },
   beforeMount() {
     window.addEventListener('beforeunload', ev => {
+      this.endCall()
       if (this.peer_id)
         ev.preventDefault()
       ev.returnValue = ""

@@ -1,6 +1,7 @@
 <template>
   <div style="height: 100vh" class="d-flex justify-content-center align-items-center">
     <div class="text-center align-self-center" v-show="callingStatus === 'calling'">
+      <audio src="/public/sounds/iphone-ringtone-47958.mp3" controls loop autoplay></audio>
       <center>
         <div class="pulse">
           <img height="250" :src="displayUser.photo"
@@ -81,7 +82,6 @@ export default {
           console.log("recieved", data)
         })
       })
-
       this.initializeWebSocket(this.remote_peer_id)
     },
 
@@ -160,8 +160,11 @@ export default {
     this.displayUser = JSON.parse(this.$route.query.display)
     this.remote_peer_id = this.$route.query.peer_id
     this.initializePeer()
-
-
+  },
+  beforeMount() {
+    window.addEventListener('beforeunload', ev => {
+      this.endCall()
+    })
   }
 }
 
