@@ -9,7 +9,7 @@ PyWebsocket is been used inside Django Channel Wrapper for realtime communicatio
 WebRTC is been used for Video and Audio calling.
 
 
-#Architecture
+# Architecture
 
 ![](https://github.com/kmrifat/django_chat/blob/master/chat_app.drawio.png?raw=true)
 
