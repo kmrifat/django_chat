@@ -35,7 +35,7 @@
   </section>
 
   <section v-else>
-    Show default message
+    <default-message-window></default-message-window>
   </section>
 
 </template>
@@ -44,12 +44,14 @@
 import ActiveUser from "./ActiveUser.vue";
 import axios from "../../../../../axios";
 import moment from "moment";
+import DefaultMessageWindow from "../../../../../components/DefaultMessageWindow.vue";
 
 export default {
   name: "MessageWindow",
   props: ['selected_user'],
   components: {
-    'active-user': ActiveUser
+    'active-user': ActiveUser,
+    'default-message-window': DefaultMessageWindow
   },
   data() {
     return {
