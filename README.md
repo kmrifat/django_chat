@@ -1,3 +1,34 @@
 # Django Chat App
 
-Agenda
+![](https://github.com/kmrifat/django_chat/blob/master/django-chat-app.gif?raw=true)
+
+A private messaging and calling application build using Django, Django Channel and Peer.js (WebRTC).
+The front end has been build in Vue.js and I use Django Rest Framework for communicate with Backend and Frontend.  
+
+PyWebsocket is been used inside Django Channel Wrapper for realtime communication. 
+WebRTC is been used for Video and Audio calling.
+
+
+#Architecture
+comming soon
+
+# Installation
+```
+git clone https://github.com/kmrifat/django_chat.git
+```
+
+### FrontEnd Installation
+```
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend Installation
+```
+cd backend
+pipenv shell
+pipenv install
+python manage.py migrate
+python manage.py runserver
+```
