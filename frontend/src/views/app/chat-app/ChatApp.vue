@@ -42,7 +42,7 @@
 
     <div class="chat-rightbar show">
       <div class="chat-details">
-        <message-window :selected_user="selected_user"></message-window>
+        <message-window ref="messageWindow" :selected_user="selected_user"></message-window>
       </div>
     </div>
 
@@ -73,6 +73,15 @@ export default {
       selected_user: store.selected_user,
       connection: null,
       message_connection: null
+    }
+  },
+  watch: {
+    'selected_user': {
+      handler() {
+        setTimeout(() => {
+          this.$refs.messageWindow.scrollDown()
+        }, 500)
+      }
     }
   },
   methods: {
@@ -131,6 +140,11 @@ export default {
           return value.username === message.sender
         })[0]
         user.messages.push(message)
+        if (this.selected_user.username === user.username) {
+          user.messages.filter(value => value.read = true)
+        }
+        this.users.splice(this.users.indexOf(user), 1)
+        this.users.unshift(user)
       }
     }
 

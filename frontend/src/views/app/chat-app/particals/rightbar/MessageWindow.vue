@@ -56,16 +56,24 @@ export default {
       message: ''
     }
   },
+  watch: {
+    'selected_user.messages': {
+      deep: true,
+      handler() {
+        if (this.$refs.hasOwnProperty('chatBody')) {
+          this.scrollDown()
+        }
+      }
+    }
+  },
   methods: {
     sendMessage() {
       this.selected_user.messages.push({
         text: this.message,
-        read: false,
-        date_time: 'now',
+        read: true,
+        date_time: moment().format(),
         sender_id: 'me'
       })
-
-      this.scrollDown()
       axios.post('message/', {
         text: this.message,
         receiver: this.selected_user.username
@@ -83,14 +91,11 @@ export default {
     },
 
     scrollDown() {
-      // let scrollHeight = this.$refs.chatBody.scrollHeight
-      // this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight + 500
-      // chatBody.scrollTo = chatBody.scrollHeight
-      // this.$refs.chatBody.scrollTo(0, this.$refs.chatBody.scrollHeight)
+      this.$refs.chatBody.scrollTop = this.$refs.chatBody.scrollHeight
     }
   },
   mounted() {
-    this.scrollDown()
+
   }
 }
 </script>

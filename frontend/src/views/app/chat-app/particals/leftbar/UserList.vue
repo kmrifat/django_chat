@@ -9,9 +9,11 @@
           <img class="align-self-center rounded-circle"
                src="http://themesbox.in/admin-templates/gappa/html/light/assets/images/girl.svg" alt="User Image">
           <div class="media-body">
-            <h5>{{ user.name }} <span class="chat-timing">{{ dateHumanize(user.messages[0]?.date_time) }}</span></h5>
+            <h5>{{ user.name }} <span v-if="getUnreadMessage(user)"
+                                      class="badge badge-primary ml-2">{{ getUnreadMessage(user) }}</span> <span
+                class="chat-timing">{{ dateHumanize(user.messages[user.messages.length - 1]?.date_time) }}</span></h5>
             <p v-if="!user.messages.length">{{ user.status }}</p>
-            <p v-else>{{user.messages.slice(-1)[0].text}}</p>
+            <p v-else>{{ summarizeMessage(user.messages.slice(-1)[0].text) }}</p>
           </div>
         </div>
       </a>
@@ -33,11 +35,23 @@ export default {
   },
   methods: {
     setSelectedUser(user) {
+      user.messages.filter(value => value.read = true)
       this.$emit('update:modelValue', user)
     },
     dateHumanize(date) {
       return moment(date).fromNow()
     },
+
+    summarizeMessage(message) {
+      if (message.length > 30) {
+        return message.substring(0, 30)
+      }
+      return message
+    },
+
+    getUnreadMessage(user) {
+      return user.messages.filter(value => !value.read).length
+    }
   }
 }
 </script>

@@ -78,7 +78,7 @@ class UsersView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        users = User.objects.exclude(pk=self.request.user.pk).all()
+        users = User.objects.exclude(pk=self.request.user.pk).order_by('-profile__online').all()
         return users
 
 

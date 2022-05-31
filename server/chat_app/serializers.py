@@ -32,21 +32,25 @@ class MessageSerializer(serializers.Serializer):
 
     def __broadcast(self, message: Message):
         serializer = MessageModelSerializer(message, many=False)
+        n_message = serializer.data
+        n_message['read'] = False
+        print(n_message)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             'chat_%s' % message.receiver.username, {
                 'type': 'new_message',
-                'message': serializer.data
+                'message': n_message
             }
         )
 
 
 class MessageModelSerializer(serializers.ModelSerializer):
     sender = serializers.CharField(read_only=True, source='sender.username')
+    read = serializers.BooleanField(default=True)
 
     class Meta:
         model = Message
-        fields = ('text', 'sender', 'date_time')
+        fields = ('text', 'sender', 'date_time', 'read')
 
 
 class UsersWithMessageSerializer(serializers.ModelSerializer):
@@ -66,7 +70,6 @@ class UsersWithMessageSerializer(serializers.ModelSerializer):
         return obj.username
 
     def get_messages(self, obj):
-        print("This obj", obj, "auth user", self.context['request'].user)
         messages = Message.objects.filter(
             Q(receiver=obj, sender=self.context['request'].user) |
             Q(sender=obj, receiver=self.context['request'].user)).prefetch_related('sender', 'receiver')
