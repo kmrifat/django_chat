@@ -10,7 +10,7 @@ WebRTC is been used for Video and Audio calling.
 
 
 #Architecture
-comming soon
+![](https://github.com/kmrifat/django_chat/blob/master/afc_project.drawio.png?raw=true)
 
 # Installation
 ```
