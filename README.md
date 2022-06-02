@@ -27,7 +27,7 @@ npm run dev
 
 ### Backend Installation
 ```
-cd backend
+cd server
 pipenv shell
 pipenv install
 python manage.py migrate
