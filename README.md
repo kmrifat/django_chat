@@ -33,3 +33,4 @@ pipenv install
 python manage.py migrate
 python manage.py runserver
 ```
+Spacial Thanks to <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg" width="50px" alt="JetBrains Logo (Main) logo."> For Awesome IDE support.
