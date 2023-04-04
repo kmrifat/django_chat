@@ -1,3 +1,5 @@
 .idea
 .vscode
 ssl
+venv/
+node_modules/

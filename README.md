@@ -28,8 +28,7 @@ npm run dev
 ### Backend Installation
 ```
 cd server
-pipenv shell
-pipenv install
+pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
